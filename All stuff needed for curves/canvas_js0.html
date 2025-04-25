@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" href="Program5CSS.css">
+<body onload="updateDrawSelection()">
+
+<div id="programElements">
+<canvas id="myCanvas" width="400" height="200" style="border:1px solid #ff00ff;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<br>
+<label for="shapes">Choose the algorithm/shape to draw!:</label>
+
+
+<select name="shapes" id="shapes">
+  <option value="DDALine">DDALine</option>
+  <option value="MidpointLine">MidpointLine</option>
+  <option value="MidpointCircle">MidpointCircle</option>
+  <option value="MidpointEllipse">MidpointEllipse</option>
+  <option value="BezierCurve">Bezier Curve</option>
+  <option value="HermiteCurve">Hermite Curve</option>
+  <option value="B-SplineCurve">B-Spline Curve</option>
+
+</select>
+<br>
+<span id="circleStuff">
+<label for="x">x:</label>
+<input type="text" id="x" name="vport-width-text">
+<label for="y">y:</label>
+<input type="text" id="y" name="vport-height-text"><br><br>
+<label for="r">r:</label>
+<input type="text" id="r" name="vport-height-text"><br><br>
+</span>
+<span id="shapeStuff">
+<label for="x1">x1:</label>
+<input type="text" id="x1" name="vport-width-text">
+<label for="y1">y1:</label>
+<input type="text" id="y1" name="vport-height-text"><br><br>
+<label for="x2">x2:</label>
+<input type="text" id="x2" name="vport-width-text">
+<label for="y2">y2:</label>
+<input type="text" id="y2" name="vport-height-text"><br><br>
+</span>
+<span id="curveStuff">
+<label for="x3">x3:</label>
+<input type="text" id="x3" name="vport-width-text">
+<label for="y3">y3:</label>
+<input type="text" id="y3" name="vport-height-text"><br><br>
+<label for="x4">x4:</label>
+<input type="text" id="x4" name="vport-width-text">
+<label for="y4">y4:</label>
+<input type="text" id="y4" name="vport-height-text"><br><br>
+</span>
+<button type="button" id="generate" onclick="generateShapeOrCurve()">Generate with points</button>
+<br><br>
+<button type="button" id="generatePrim" onclick="generateShapeOrCurvePrim()">Generate with primitives</button>
+
+</div>
+
+<script src="Program5JS.js"></script>
+
+</body>
+</html>
+

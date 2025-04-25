@@ -1,0 +1,137 @@
+
+<!-- saved from url=(0201)https://alt-5f9c84db7d38a.blackboard.com/bbcswebdav/pid-3227621-dt-content-rid-37240845_1/courses/L3430-3747/prog3.html?one_hash=4D0530EC8648D1DB760A7F4878AE34DD&f_hash=3D6A9B1200FA7D50581A47861FA0E932 -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="./Simple Rubberbanding Example._files/mathcont.css" rel="stylesheet" type="text/css">
+<meta name="description" content="Canvas with rubber band selection box.">
+<meta name="keywords" content="canvas, rubber band, selection, save, screen, restore, HTML5">
+<title>Simple Rubberbanding Example.</title>
+
+
+
+</head>
+
+<body onload="initialize()" onmousedown="mouse_down(event)" onmouseup="mouse_up(event)" onmousemove="mouse_move(event)" "="" data-new-gr-c-s-loaded="14.1226.0">
+
+<table border="1"><tbody><tr><td width="600" height="600">
+        
+        <canvas id="layer1" style="z-index:1; position:absolute;left:0px;top:0px " width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+
+        <canvas id="layer2" style="z-index:1; position:absolute;left:0px;top:0px " width="600" height="600"> Your browser doesn't support the canvas tag!</canvas>
+
+</td><td>
+
+<h1>Canvas with rubber band selection box.</h1>
+<!--
+mouse_down:
+<p id="val1"></p>
+
+mouse_move:
+<p id="val2">X: 812 Y: 532 is_down = false</p>
+
+mouse_up:
+<p id="val3"></p>
+-->
+<span id="shapeStuff">
+<label for="shapes">Choose a shape to draw!:</label>
+
+
+<select name="shapes" id="shapes">
+  <option value="line">Line</option>
+  <option value="triangle">Triangle</option>
+  <option value="square">Square</option>
+  <option value="rectangle">Rectangle</option>
+  <option value="circle">Circle</option>
+  <option value="ellipse">Ellipse</option>
+  <option value="curve">Curve</option>
+  <option value="polyline">Polyline</option>
+  <option value="polygon">Polygon</option>
+</select>
+
+<span id="polygonSides">
+<label for="sides" class="sides">Choose the number of polygon sides!:</label>
+
+<select name="sides" class="sides" id="sides" display = "none">
+  <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+  <option value="9">9</option>
+  <option value="10">10</option>
+</select>
+</span>
+
+<h3 id="shapeIndicator">CURRENT SHAPE SELECTED: LINE</h3>
+</span>
+<label for="mode">Choose a mode!:</label>
+
+<select name="mode" id="mode">
+	<option value="draw">Draw</option>
+	<option value="translate">Translate</option>
+	<option value="scale">Scale</option>
+	<option value="rotate">Rotate</option>
+</select>
+
+<h3 id="modeIndicator">CURRENT MODE SELECTED: DRAW</h3>
+<button type="button" id="generate" onclick="clearCanvas()">New Diagram</button>  <button  onclick="undo()">UNDO</button>
+<br><br>
+
+<span id="thickness">
+  <label for="thickness" class="thickness">Choose the line THICKness!:</label>
+  
+  <select name="thicknessSelect" class="thicknessSelect" id="thicknessSelect" display = "none">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="5">5</option>
+    <option value="8">8</option>
+    <option value="10">10</option>
+  </select>
+  </span>
+<br><br>
+<label for="colorPick" class="colorPick">Choose the line COLOR!:</label><br>
+<button style="background-color: red; color: white;" onclick="setShapeColor('red')">RED</button>
+<button style="background-color: orange; color: white;" onclick="setShapeColor('orange')">ORANGE</button>
+<button style="background-color: yellow; color: black;" onclick="setShapeColor('yellow')">YELLOW</button><br>
+<button style="background-color: green; color: white;" onclick="setShapeColor('green')">GREEN</button>
+<button style="background-color: blue; color: white;" onclick="setShapeColor('blue')">BLUE</button>
+<button style="background-color: purple; color: white;" onclick="setShapeColor('purple')">PURPLE</button><br>
+<button style="background-color: black; color: white;" onclick="setShapeColor('black')">BLACK</button>
+<button style="background-color: white; color: black;" onclick="setShapeColor('white')">WHITE</button>
+<h3 id="colorIndicator">CURRENT COLOR SELECTED: WHITE</h3>
+
+<br><br>
+<button  onclick="saveDiagram()">SAVE DIAGRAM JSON</button>
+Load from JSON:<input type="file" id="fileInput" accept=".json" /><br>
+<button  onclick="saveJPEG()">SAVE JPEG</button>
+<button  onclick="exportPDF()">EXPORT PDF</button>
+<br>
+<button onclick="toggleSnapGrid()">Toggle Grid</button>
+</td>
+</tr>
+</tbody></table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="MV.js"></script>
+<script src="FinalProjectJS.js"></script>
+
+</body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+      div.grammarly-desktop-integration {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select:none;
+        user-select:none;
+      }
+
+      div.grammarly-desktop-integration:before {
+        content: attr(data-content);
+      }
+    </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration></html>
