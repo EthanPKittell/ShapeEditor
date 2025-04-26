@@ -3,9 +3,12 @@ let shapes = [];
 let undoStack = [];
 //makes sure the undo stack doesn't get too big
 if (undoStack.length >= 20) undoStack.shift();
-let shapeSelected = null;
+let selectedShape = null;
 
 let multipoints = [];
+
+//copy var
+let clipboardShape = null;
 
 let gridOn = false;
 var shapeSelectVar = "line"
@@ -20,7 +23,55 @@ const polygonSides = document.getElementById("sides");
 const thicknessSelectVal = document.getElementById("thicknessSelect");
 const colorIndicator = document.getElementById("colorIndicator");
 
+//copy paste functions
+function copyShape() {
+    if (selectedShape) {
+        clipboardShape = JSON.parse(JSON.stringify(selectedShape)); // deep copy
+        console.log("Copied shape:", clipboardShape);
+    } else {
+        console.log("No shape selected to copy.");
+    }
+}
 
+function pasteShape() {
+    if (clipboardShape) {
+        let pastedShape = JSON.parse(JSON.stringify(clipboardShape)); // clone it again
+
+        // Offset pasted shape so it's not directly on top
+        if (pastedShape.points) {
+            for (let pt of pastedShape.points) {
+                pt.x += 20;
+                pt.y += 20;
+            }
+        } else {
+            pastedShape.x += 20;
+            pastedShape.y += 20;
+        }
+
+        shapes.push(pastedShape);
+        pushUndoState();
+        drawShapes();
+        console.log("Pasted shape:", pastedShape);
+    } else {
+        console.log("Clipboard is empty.");
+    }
+}
+
+//event listeners for all ctrl + actions
+document.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.key === "c") {
+        e.preventDefault();
+        copyShape();
+    }
+    if (e.ctrlKey && e.key === "v") {
+        e.preventDefault();
+        pasteShape();
+    }
+    if (e.ctrlKey && e.key === "z") {
+        e.preventDefault();
+        undo();
+    }
+});
 
 //grid toggle
 function toggleSnapGrid() {
@@ -183,12 +234,24 @@ function undo() {
       drawShapes();
     }
   }
+//snap to grid function for these mouse funcs
+
+function snap(coord, spacing = 30) {
+    return Math.round(coord / spacing) * spacing;
+}
+
+
 
 // callback for mouse down events
 function mouse_down(event) {
 
 	xDown = event.clientX;
 	yDown = event.clientY;
+
+    if (gridOn) {
+        xDown = snap(xDown);
+        yDown = snap(yDown);
+    }
 
 	is_down = true;    
     
@@ -197,7 +260,7 @@ function mouse_down(event) {
 	//document.getElementById("val1").innerHTML = coords;
 
     //If we are doing some type of translation/scaling/rotation we can select shapes
-    if (modeSelectVar != "draw"){
+    if (modeSelectVar != "draw" && xDown <= canvas1.width && yDown <= canvas1.height){
         //function for selecting the shape based on its saved coordinates
         selectShapeToTransform(event);
     }
@@ -343,6 +406,12 @@ function mouse_up(event) {
 	xUp = event.clientX;
 	yUp = event.clientY;
 
+    if (gridOn) {
+        xUp = snap(xUp);
+        yUp = snap(yUp);
+    }
+    
+
 	is_down = false;
 
 	ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
@@ -350,6 +419,7 @@ function mouse_up(event) {
 	coords = "X: "+ xUp + " Y: " + yUp +" is_down = " + is_down;
 
     if (xUp <= canvas1.width && yUp <= canvas1.height) {
+        
         ctx1.beginPath();
         //this is where line rubberbanding ends (mouse up completes line)
         if (modeSelectVar == "draw") {
@@ -357,7 +427,8 @@ function mouse_up(event) {
             //same code as mouse move for drawing the line
             if (shapeSelectVar == "line"){
                 ctx1.moveTo(xDown, yDown);
-                ctx1.lineTo(event.offsetX, event.offsetY);
+                //ctx1.lineTo(event.offsetX, event.offsetY);
+                ctx1.lineTo(xUp, yUp);
                 //final shape look is white with a wider line width to show it has been drawn
                 ctx1.strokeStyle = shapeColorSelect;
                 ctx1.lineWidth = thicknessSelect;
@@ -370,7 +441,7 @@ function mouse_up(event) {
             }
             //circle end
             else if(shapeSelectVar == "circle"){
-                let radius = Math.sqrt((x - xDown) ** 2 + (y - yDown) ** 2);
+                let radius = Math.sqrt((xUp - xDown) ** 2 + (yUp - yDown) ** 2);
                 ctx1.arc(xDown,yDown,radius,0,2*Math.PI);
                 ctx1.strokeStyle = shapeColorSelect;
                 ctx1.lineWidth = thicknessSelect;
@@ -385,7 +456,7 @@ function mouse_up(event) {
             //rectangle end
             else if(shapeSelectVar == "rectangle"){
                 
-                ctx1.strokeRect(xDown,yDown, x-xDown, y-yDown);
+                ctx1.strokeRect(xDown,yDown, xUp-xDown, yUp-yDown);
                 ctx1.strokeStyle = shapeColorSelect;
                 ctx1.lineWidth = thicknessSelect;
                 let newShape = { type: shapeSelectVar, x: xDown, y: yDown, width: xUp - xDown, height: yUp - yDown, angle: 0, thickness: thicknessSelect, colorVal: shapeColorSelect};
@@ -398,7 +469,7 @@ function mouse_up(event) {
             else if(shapeSelectVar == "ellipse"){
                 
                 
-                ctx1.ellipse(xDown, yDown, Math.abs(x-xDown), Math.abs(y-yDown), 0, 0, 2 * Math.PI);
+                ctx1.ellipse(xDown, yDown, Math.abs(xUp-xDown), Math.abs(yUp-yDown), 0, 0, 2 * Math.PI);
                     //using abs becuase ellipse doesn't use negative vals
                 ctx1.strokeStyle = shapeColorSelect;
                 ctx1.lineWidth = thicknessSelect;
@@ -414,8 +485,8 @@ function mouse_up(event) {
                 ctx1.strokeStyle = shapeColorSelect;
                 ctx1.lineWidth = thicknessSelect;
                 //took this from my mouse move function
-                let dx = x - xDown;
-                let dy = y - yDown;   
+                let dx = xUp - xDown;
+                let dy = yUp - yDown;   
 
                 //I have it using the min for both sides because I want to keep the square sides equal
                 let side = Math.min(Math.abs(dx), Math.abs(dy)); 

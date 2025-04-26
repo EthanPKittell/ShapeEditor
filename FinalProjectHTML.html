@@ -69,6 +69,7 @@ mouse_up:
 	<option value="translate">Translate</option>
 	<option value="scale">Scale</option>
 	<option value="rotate">Rotate</option>
+  <option value="select">Select</option>
 </select>
 
 <h3 id="modeIndicator">CURRENT MODE SELECTED: DRAW</h3>
@@ -106,6 +107,8 @@ Load from JSON:<input type="file" id="fileInput" accept=".json" /><br>
 <button  onclick="exportPDF()">EXPORT PDF</button>
 <br>
 <button onclick="toggleSnapGrid()">Toggle Grid</button>
+<br>
+<button onclick="copyShape()">Copy (Ctrl+C)</button><button onclick="pasteShape()">Paste (Ctrl+V)</button>
 </td>
 </tr>
 </tbody></table>
