@@ -125,7 +125,7 @@ function saveJPEG() {
     const canvas = document.getElementById("layer1");
     const image = canvas.toDataURL("image/jpeg");
 
-    const saveCanvasImg = document.createElement("saveCanvasImg");
+    const saveCanvasImg = document.createElement("a");
     saveCanvasImg.href = image;
     //download the jpeg
     saveCanvasImg.download = "canvas_diagram.jpg";
