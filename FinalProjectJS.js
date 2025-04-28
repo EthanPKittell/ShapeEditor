@@ -23,21 +23,28 @@ const polygonSides = document.getElementById("sides");
 const thicknessSelectVal = document.getElementById("thicknessSelect");
 const colorIndicator = document.getElementById("colorIndicator");
 
+function openHelpPage() {
+    window.open('HelpPage.html', '_blank');
+}
+
 //copy paste functions
 function copyShape() {
     if (selectedShape) {
-        clipboardShape = JSON.parse(JSON.stringify(selectedShape)); // deep copy
+        //copy of selected shape added to clipboard
+        clipboardShape = JSON.parse(JSON.stringify(selectedShape)); 
         console.log("Copied shape:", clipboardShape);
     } else {
+        //debug message to tell you that nothing can be copied
         console.log("No shape selected to copy.");
     }
 }
 
 function pasteShape() {
     if (clipboardShape) {
-        let pastedShape = JSON.parse(JSON.stringify(clipboardShape)); // clone it again
+        //pushUndoState();
+        let pastedShape = JSON.parse(JSON.stringify(clipboardShape)); //clone it again
 
-        // Offset pasted shape so it's not directly on top
+        //move pasted shape a bit so it's not directly on top of the other shape
         if (pastedShape.points) {
             for (let pt of pastedShape.points) {
                 pt.x += 20;
@@ -47,9 +54,9 @@ function pasteShape() {
             pastedShape.x += 20;
             pastedShape.y += 20;
         }
-
+        //push the created shape to the shapes array
         shapes.push(pastedShape);
-        pushUndoState();
+        
         drawShapes();
         console.log("Pasted shape:", pastedShape);
     } else {
@@ -58,41 +65,46 @@ function pasteShape() {
 }
 
 //event listeners for all ctrl + actions
-document.addEventListener("keydown", function (e) {
-    if (e.ctrlKey && e.key === "c") {
-        e.preventDefault();
+document.addEventListener("keydown", function (pressedKey) {
+
+    if (pressedKey.ctrlKey && pressedKey.key === "c") {
+        //copy
+        pressedKey.preventDefault(); 
         copyShape();
     }
-    if (e.ctrlKey && e.key === "v") {
-        e.preventDefault();
+    if (pressedKey.ctrlKey && pressedKey.key === "v") {
+        pressedKey.preventDefault(); 
         pasteShape();
     }
-    if (e.ctrlKey && e.key === "z") {
-        e.preventDefault();
-        undo();
+    if (pressedKey.ctrlKey && pressedKey.key === "z") {
+        pressedKey.preventDefault();
+        undo(); 
     }
 });
 
 //grid toggle
 function toggleSnapGrid() {
+
     gridOn = !gridOn;
     drawShapes();
 
 }
 function drawGrid() {
-    const spacing = 30; // grid size
-    ctx1.clearRect(0, 0, canvas1.width, canvas1.height); // clear old grid
+    //grid spacing size
+    const spacing = 30; 
+
+    ctx1.clearRect(0, 0, canvas1.width, canvas1.height);//clear old grid
     //clearing the canvss
     ctx2.clearRect(0, 0, canvas1.width, canvas1.height);
     //fill the background
     ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
 
-
+    //if the grid is on set up all grid style settings
     if (!gridOn) return;
-
-    ctx1.beginPath();
     ctx1.strokeStyle = "black";
     ctx1.lineWidth = 1.0;
+    ctx1.beginPath();
+    
 
     for (let x = 0; x <= canvas2.width; x += spacing) {
         ctx1.moveTo(x, 0);
@@ -109,15 +121,17 @@ function drawGrid() {
 
 //file saving functions
 function saveJPEG() {
-    const canvas = document.getElementById("layer1"); // your main canvas
+    //main canvas
+    const canvas = document.getElementById("layer1");
     const image = canvas.toDataURL("image/jpeg");
 
-    const a = document.createElement("a");
-    a.href = image;
-    a.download = "canvas_image.jpg";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const saveCanvasImg = document.createElement("saveCanvasImg");
+    saveCanvasImg.href = image;
+    //download the jpeg
+    saveCanvasImg.download = "canvas_diagram.jpg";
+    document.body.appendChild(saveCanvasImg);
+    saveCanvasImg.click();
+    document.body.removeChild(saveCanvasImg);
 }
 
 async function exportPDF() {
@@ -130,22 +144,23 @@ async function exportPDF() {
         unit: "px",
         format: [canvas.width, canvas.height]
     });
-
+    //saving the canvas diagram as a pdf
     pdf.addImage(imageData, 'JPEG', 0, 0, canvas.width, canvas.height);
     pdf.save("canvas_diagram.pdf");
 }
 
 function saveDiagram() {
-    const dataStr = JSON.stringify(shapes, null, 2); //Pretty-print
+    const dataStr = JSON.stringify(shapes, null, 2);//Pretty-print
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
   
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "diagram.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    //save the json diagram
+    const saveDiagramJSON = document.createElement("a");
+    saveDiagramJSON.href = url;
+    saveDiagramJSON.download = "diagram.json";
+    document.body.appendChild(saveDiagramJSON);
+    saveDiagramJSON.click();
+    document.body.removeChild(saveDiagramJSON);
     URL.revokeObjectURL(url);
 }
 
@@ -156,9 +171,9 @@ function loadDiagram(event) {
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = function (e) {
+  reader.onload = function (loadJSONFile) {
     try {
-      const loadedShapes = JSON.parse(e.target.result);
+      const loadedShapes = JSON.parse(loadJSONFile.target.result);
       shapes = loadedShapes;
       drawShapes();
     } catch (err) {
@@ -176,7 +191,7 @@ function initialize(){
     canvas1 = document.getElementById("layer1");
 
    	ctx1 = canvas1.getContext("2d");
-	
+	//gray background
 	ctx1.fillStyle = "gray";
 
     ctx1.fillRect(0, 0, canvas1.width, canvas1.height);
@@ -209,30 +224,30 @@ function setShapeColor(color) {
     colorIndicator.innerText = 'CURRENT COLOR SELECTED: ' + String(color).toUpperCase();
 }
 
-/*function undo() {
+/*function undo() { //this didn't work
     shapes.pop();
     drawShapes();
 }*/
 function pushUndoState() {
-    undoStack.push(JSON.parse(JSON.stringify(shapes))); //deep copy
+    undoStack.push(JSON.parse(JSON.stringify(shapes))); //copy shapes array
     
     //if (undoStack.length > 20) undoStack.shift(); // optional limit
 }
 function undo() {
     if (undoStack.length > 0) {
         
-    shapes = undoStack.pop();
-    
-      drawShapes();
-    
-      console.log(shapes);
-      console.log(undoStack);
-    } else {
-    
-      console.log("Nothing to undo!");
-      shapes = [];
-      drawShapes();
-    }
+        shapes = undoStack.pop();
+        
+        drawShapes();
+        
+        console.log(shapes);
+        console.log(undoStack);
+        } else {
+        
+        console.log("Nothing to undo!");
+        shapes = [];
+        drawShapes();
+        }
   }
 //snap to grid function for these mouse funcs
 
@@ -275,7 +290,7 @@ function mouse_move(event) {
 	if(is_down)	{
 		ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
 
-		// elastic band
+		//rubber band effect
 		ctx2.strokeStyle = "yellow";
 
         //checking that the mouse is actually IN the canvas before doing anything
@@ -400,7 +415,7 @@ function mouse_move(event) {
 }
 
 
-// callback for mouse up events
+//callback for mouse up events
 function mouse_up(event) {
 
 	xUp = event.clientX;
@@ -426,12 +441,13 @@ function mouse_up(event) {
 
             //same code as mouse move for drawing the line
             if (shapeSelectVar == "line"){
+                ctx1.strokeStyle = shapeColorSelect;
+                ctx1.lineWidth = thicknessSelect;
                 ctx1.moveTo(xDown, yDown);
                 //ctx1.lineTo(event.offsetX, event.offsetY);
                 ctx1.lineTo(xUp, yUp);
                 //final shape look is white with a wider line width to show it has been drawn
-                ctx1.strokeStyle = shapeColorSelect;
-                ctx1.lineWidth = thicknessSelect;
+                
                 //creating object to define shape for when we redraw all shapes
                 let newShape = { type: shapeSelectVar, x: xDown, y: yDown, width: xUp - xDown, height: yUp - yDown, angle: 0, thickness: thicknessSelect, colorVal: shapeColorSelect};
                 pushUndoState();
@@ -441,10 +457,11 @@ function mouse_up(event) {
             }
             //circle end
             else if(shapeSelectVar == "circle"){
-                let radius = Math.sqrt((xUp - xDown) ** 2 + (yUp - yDown) ** 2);
-                ctx1.arc(xDown,yDown,radius,0,2*Math.PI);
                 ctx1.strokeStyle = shapeColorSelect;
                 ctx1.lineWidth = thicknessSelect;
+                let radius = Math.sqrt((xUp - xDown) ** 2 + (yUp - yDown) ** 2);
+                ctx1.arc(xDown,yDown,radius,0,2*Math.PI);
+                
                 let newShape = { type: shapeSelectVar, x: xDown, y: yDown, width: xUp - xDown, height: yUp - yDown, angle: 0 , thickness: thicknessSelect, colorVal: shapeColorSelect};
                 newShape.radius = Math.sqrt((xUp - xDown) ** 2 + (yUp - yDown) ** 2);
                 //added radius to the shape object for redrawing
@@ -455,10 +472,11 @@ function mouse_up(event) {
             }
             //rectangle end
             else if(shapeSelectVar == "rectangle"){
-                
-                ctx1.strokeRect(xDown,yDown, xUp-xDown, yUp-yDown);
                 ctx1.strokeStyle = shapeColorSelect;
                 ctx1.lineWidth = thicknessSelect;
+                ctx1.strokeRect(xDown,yDown, xUp-xDown, yUp-yDown);
+                
+                
                 let newShape = { type: shapeSelectVar, x: xDown, y: yDown, width: xUp - xDown, height: yUp - yDown, angle: 0, thickness: thicknessSelect, colorVal: shapeColorSelect};
                 pushUndoState();
                 shapes.push(newShape);
@@ -468,10 +486,11 @@ function mouse_up(event) {
             //rectangle end
             else if(shapeSelectVar == "ellipse"){
                 
-                
+                ctx1.strokeStyle = shapeColorSelect;
+                ctx1.lineWidth = thicknessSelect;
                 ctx1.ellipse(xDown, yDown, Math.abs(xUp-xDown), Math.abs(yUp-yDown), 0, 0, 2 * Math.PI);
                     //using abs becuase ellipse doesn't use negative vals
-                ctx1.strokeStyle = shapeColorSelect;
+                
                 ctx1.lineWidth = thicknessSelect;
                 let newShape = { type: shapeSelectVar, x: xDown, y: yDown, width: xUp - xDown, height: yUp - yDown, angle: 0, thickness: thicknessSelect, colorVal: shapeColorSelect};
                 pushUndoState();
@@ -506,6 +525,8 @@ function mouse_up(event) {
             }
             //triangle end
             else if(shapeSelectVar == "triangle"){
+                ctx1.strokeStyle = shapeColorSelect;
+                ctx1.lineWidth = thicknessSelect;
                 let midX = (xDown + xUp) / 2;
 
                 ctx1.beginPath();
@@ -513,8 +534,7 @@ function mouse_up(event) {
                 ctx1.lineTo(xUp, yUp);
                 ctx1.lineTo(midX, yDown);
                 ctx1.closePath();
-                ctx1.strokeStyle = shapeColorSelect;
-                ctx1.lineWidth = thicknessSelect;
+                
                 let newShape = { type: shapeSelectVar, x: xDown, y: yDown, width: xUp - xDown, height: yUp - yDown, angle: 0, thickness: thicknessSelect, colorVal: shapeColorSelect};
                 pushUndoState();
                 shapes.push(newShape);
@@ -523,7 +543,8 @@ function mouse_up(event) {
             }
             //curve end
             else if(shapeSelectVar == "curve"){
-                
+                ctx1.strokeStyle = shapeColorSelect;
+                ctx1.lineWidth = thicknessSelect;
                 multipoints.push({ x: xUp, y: yUp });
                 console.log(multipoints)
                 if (multipoints.length == 4){
@@ -531,8 +552,7 @@ function mouse_up(event) {
                 ctx1.moveTo(multipoints[0].x, multipoints[0].y);
                 ctx1.bezierCurveTo(multipoints[1].x, multipoints[1].y, multipoints[2].x, multipoints[2].y, multipoints[3].x, multipoints[3].y); 
                 
-                ctx1.strokeStyle = shapeColorSelect;
-                ctx1.lineWidth = thicknessSelect;
+                
                 
                 let newShape = { type: shapeSelectVar, points: multipoints, width: xUp - xDown, height: yUp - yDown, angle: 0, thickness: thicknessSelect, colorVal: shapeColorSelect};
                 pushUndoState();
@@ -545,11 +565,12 @@ function mouse_up(event) {
             }
             //polyline end
             else if(shapeSelectVar == "polyline"){
+                ctx1.strokeStyle = shapeColorSelect;
+                ctx1.lineWidth = thicknessSelect;
                 multipoints.push({ x: xUp, y: yUp });
                 console.log(multipoints)
                 if (multipoints.length == 4){
-                    ctx1.strokeStyle = shapeColorSelect;
-                    ctx1.lineWidth = thicknessSelect;
+                   
                     for (let i = 0; i < multipoints.length-1; i++){
                         
                         ctx1.moveTo(multipoints[i].x, multipoints[i].y);
@@ -566,13 +587,13 @@ function mouse_up(event) {
             }
             //polygon end
             else if(shapeSelectVar == "polygon"){
-                
+                ctx1.strokeStyle = shapeColorSelect;
+                ctx1.lineWidth = thicknessSelect;
                 //same code as in mouse_move for the drawing of this polygon
                 let radius = Math.sqrt((xUp - xDown) ** 2 + (yUp - yDown) ** 2);
 
                 ctx1.beginPath();
-                ctx1.strokeStyle = shapeColorSelect;
-                ctx1.lineWidth = thicknessSelect;
+                
                 for (let i = 0; i < sides; i++) {
                     let angle = (i * 2 * Math.PI) / sides;
                     let xPos = xDown + radius * Math.cos(angle);
@@ -596,8 +617,8 @@ function mouse_up(event) {
         }
         ctx1.stroke();
     }
-    console.log(shapes);
-    console.log(undoStack);
+    //console.log(shapes);
+    //console.log(undoStack);
 	//document.getElementById("val3").innerHTML = coords;
 }
 
@@ -685,7 +706,7 @@ function selectShapeToTransform(event) {
     }
     //for debugging shows which shape is selected
     if (selectedShape) {
-        console.log("Selected shape:", selectedShape);
+        //console.log("Selected shape:", selectedShape);
         pushUndoState();
     }
     

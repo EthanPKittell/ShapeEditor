@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Help For The Shape Editor</title>
+    <style> 
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input[type="text"] { width: 300px; padding: 10px; }
+
+    *{text-align: center;}
+
+    .help-section { margin-top: 20px; }
+    .help-topic { margin-bottom: 20px; } 
+    .help-topic.hidden { display: none; }
+     
+    </style>
+</head>
+<body>
+
+<h1>Shape Editor Help</h1>
+
+<input type="text" id="searchBox" placeholder="Search for a topic...">
+
+<div class="help-section" id="helpContent"> 
+<hr>
+
+<div class="help-topic">  
+    <h2>Choose Shape</h2>
+    <p>Select a shape from the dropdown to have appear when drawing on the canvas.</p>
+    
+</div>
+
+<div class="help-topic">  
+    <h2>Drawing Modes</h2>
+    <p>Select a drawing mode either: draw, translate, scale, rotate or select.</p>
+    <p>Every mode except draw can be used by clicking on the desired shape to transform.</p>
+    <p>Select mode is used for selecting object to COPY and PASTE.</p>
+    
+</div>
+
+<div class="help-topic">  
+    <h2>Shape Thickness and Color</h2>
+    <p>Select a shape thickness from a dropdown list. Pick a a color for the shape to be drawn with.
+        The default color is white.
+    </p>
+    
+    
+</div>
+
+<div class="help-topic">  
+    <h2>Drawing Shapes</h2>
+    <p>Select a shape from the dropdown and click and drag on the canvas to draw it for rubber banding shapes.</p>
+    <p>WARNING: curve and polyline need to be drawn with 4 clicks for their points.</p>
+</div>
+
+<div class="help-topic">  
+    <h2>Rubber band shapes</h2>
+    <p>This includes shapes: Line, Triangle, Square, Rectangle, Circle, Ellipse, and Polygon
+        </p>
+    <p>For these shapes a "ghost" shape will draw to give you an example of how the shape will look while the mouse is down.
+    </p>
+    <p>Once you lift up on the mouse the shape will draw in the same way as the last seen "ghost" shape.</p>
+</div>
+
+<div class="help-topic">  
+    <h2>Multi-point shapes</h2>
+    <p>This includes shapes: Polyline and Curves
+    </p>
+    <p>For these shapes no "ghost" shape will draw. Once you click 4 times the shape will appear according
+        to the users clicks on the canvas.
+    </p>
+</div>
+
+<div class="help-topic">
+    <h2>Undo</h2> 
+    <p>Click the Undo button to undo your last change. This can also be done with ctrl + the z key.</p>   
+</div>
+
+<div class="help-topic">
+    <h2>Save and Load</h2>
+    <p>Save your diagram as a JSON file and load it later to bring the shapes back onto the canvas.</p> 
+    <p>WARNING loading a JSON file will get rid of any shapes on the canvas. So save anything you want to keep!
+    </p>
+</div>
+
+<div class="help-topic">
+    <h2>Save as JPEG / Export to PDF</h2>
+    <p>Use the Save as JPEG or Export to PDF buttons to download your work as an image or a PDF and also name the file.</p>
+
+</div>
+    
+ 
+<div class="help-topic">
+    <h2>Copy and Paste</h2>
+    <p>Select a shape, press the copy button or Ctrl+C to copy it, and press the past button or Ctrl+V to paste a duplicated shape.</p>
+</div>
+
+<div class="help-topic">
+    <h2>Grid and Snap</h2> 
+    <p>Toggle the grid visibility and snapping with the toggle grid button to make precision drawing easier.</p>
+    <p>WARNING this grid will show up in any saved PDFs or JPEGs if it isn't toggled off with the toggle button.
+    </p>
+</div>
+</div>
+
+<script>
+const search = document.getElementById('searchBox');
+const helpTitles = document.querySelectorAll('.help-topic');
+
+search.addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    helpTitles.forEach(topic => {
+        const text = topic.innerText.toLowerCase();
+        if (text.includes(query)) {
+            //if what you are searching is in the topic it will appear
+            topic.classList.remove('hidden');
+        } else {
+            topic.classList.add('hidden');
+        }
+        });
+    });
+</script>
+
+</body>
+</html>
